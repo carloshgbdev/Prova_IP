@@ -135,8 +135,217 @@ def check_winner(board: np.ndarray, names: List[str]):
 
     return False
 
+# Essa função executa a jogada do BOT
+def bot_move(board: np.ndarray, number_of_moves: int):
+    # Se for a primeira jogada do BOT, ele joga ou no centro ou em um canto de esquina aleatório
+    if number_of_moves in [0, 1]:
+        if check_board(board, "2 2"):
+            # Se a posição central estiver vazia, o BOT joga nela
+            return "2 2"
+        else:
+            # Se a posição central estiver ocupada, o BOT joga em um canto de esquina aleatório
+            np.random.seed()
+            moves = ["1 1", "1 3", "3 1", "3 3"]
+
+            return np.random.choice(moves)
+    
+    # Se o BOT tiver duas marcações em uma linha, ele joga na posição vazia para ganhar
+    # Senão, se o jogador tiver duas marcações em uma linha, ele joga na posição vazia para bloquear
+    for i, row in enumerate(board):
+        if sum(row) == -2:
+            for j, column in enumerate(row):
+                if column == 0:
+                    return f"{i + 1} {j + 1}"
+        elif sum(row) == 2:
+            for j, column in enumerate(row):
+                if column == 0:
+                    return f"{i + 1} {j + 1}"
+    
+    # Se o BOT tiver duas marcações em uma coluna, ele joga na posição vazia para ganhar
+    # Senão, se o jogador tiver duas marcações em uma coluna, ele joga na posição vazia para bloquear
+    for i, column in enumerate(board.T):
+        if sum(column) == -2:
+            for j, row in enumerate(column):
+                if row == 0:
+                    return f"{j + 1} {i + 1}"
+        elif sum(column) == 2:
+            for j, row in enumerate(column):
+                if row == 0:
+                    return f"{j + 1} {i + 1}"
+    
+    # Se o BOT tiver duas marcações em uma diagonal, ele joga na posição vazia para ganhar
+    # Senão, se o jogador tiver duas marcações em uma diagonal, ele joga na posição vazia para bloquear
+    diagonal = board.diagonal()
+    if sum(diagonal) == -2:
+        for i, row in enumerate(diagonal):
+            if row == 0:
+                return f"{i + 1} {i + 1}"
+    elif sum(diagonal) == 2:
+        for i, row in enumerate(diagonal):
+            if row == 0:
+                return f"{i + 1} {i + 1}"
+
+    # Se o BOT tiver duas marcações em uma diagonal secundária, ele joga na posição vazia para ganhar
+    # Senão, se o jogador tiver duas marcações em uma diagonal secundária, ele joga na posição vazia para bloquear
+    secondary_diagonal = np.fliplr(board).diagonal()
+    if sum(secondary_diagonal) == -2:
+        for i, row in enumerate(secondary_diagonal):
+            if row == 0:
+                return f"{i + 1} {3 - i}"
+    elif sum(secondary_diagonal) == 2:
+        for i, row in enumerate(secondary_diagonal):
+            if row == 0:
+                return f"{i + 1} {3 - i}"
+    
+    # Se acontecer uma posição parecida com o tabuleiro abaixo, ele impede o jogador de ganhar
+    # [ ] [O] [ ]
+    # [ ] [X] [ ]
+    # [ ] [ ] [O]
+    if board[2, 0] == 1:
+        if board[0, 1] == 1:
+            if check_board(board, "1 1"):
+                return "1 1"
+        elif board[1, 2] == 1:
+            if check_board(board, "3 1"):
+                return "3 3"
+    elif board[0, 2] == 1:
+        if board[2, 1] == 1:
+            if check_board(board, "3 3"):
+                return "3 3"
+        elif board[1, 0] == 1:
+            if check_board(board, "1 3"):
+                return "1 1"
+    elif board[0, 0] == 1:
+        if board[2, 1] == 1:
+            if check_board(board, "3 1"):
+                return "3 1"
+        elif board[1, 2] == 1:
+            if check_board(board, "1 3"):
+                return "1 3"
+    elif board[2, 2] == 1:
+        if board[0, 1] == 1:
+            if check_board(board, "1 3"):
+                return "1 3"
+        elif board[1, 0] == 1:
+            if check_board(board, "3 1"):
+                return "3 1"
+
+    # Se acontecer uma posição parecida com o tabuleiro abaixo, ele impede o jogador de ganhar
+    # [ ] [O] [ ]
+    # [ ] [X] [O]
+    # [ ] [ ] [ ]
+    if board[0, 1] == 1:
+        if board[1, 2] == 1:
+            np.random.seed()
+            moves = ["1 1", "3 3", "1 3"]
+            moves = np.random.shuffle(moves)
+
+            for move in moves:
+                if check_board(board, move):
+                    return move
+        elif board[1, 0] == 1:
+            np.random.seed()
+            moves = ["1 3", "3 1", "1 1"]
+            moves = np.random.shuffle(moves)
+            
+            for move in moves:
+                if check_board(board, move):
+                    return move
+    elif board[2, 1] == 1:
+        if board[1, 0] == 1:
+            np.random.seed()
+            moves = ["3 3", "1 1", "3 1"]
+            moves = np.random.shuffle(moves)
+            
+            for move in moves:
+                if check_board(board, move):
+                    return move
+        elif board[1, 2] == 1:
+            np.random.seed()
+            moves = ["3 1", "1 3", "3 3"]
+            moves = np.random.shuffle(moves)
+            
+            for move in moves:
+                if check_board(board, move):
+                    return move
+    
+    # Se acontecer uma posição parecida com o tabuleiro abaixo, ele impede o jogador de ganhar
+    # [ ] [ ] [O]
+    # [ ] [O] [ ]
+    # [X] [ ] [ ]
+    if board[1, 1] == 1:
+        corners = board[0, 0] == 1 or board[0, 2] == 1 or board[2, 0] == 1 or board[2, 2] == 1
+        if corners:
+            np.random.seed()
+            moves = ["1 1", "1 3", "3 1", "3 3"]
+            moves = np.random.shuffle(moves)
+            
+            for move in moves:
+                if check_board(board, move):
+                    return move
+    
+    # Se acontecer uma posição parecida com o tabuleiro abaixo, ele joga para ganhar
+    # [ ] [ ] [X]
+    # [ ] [X] [ ]
+    # [O] [O] [ ]
+    if board[1, 1] == -1:
+        if board[0, 0] == -1 or board[2, 2] == -1:
+            np.random.seed()
+            moves = ["1 3", "3 1"]
+            moves = np.random.shuffle(moves)
+            
+            for move in moves:
+                if check_board(board, move):
+                    return move
+        elif board[0, 2] == -1 or board[2, 0] == -1:
+            np.random.seed()
+            moves = ["1 1", "3 3"]
+            moves = np.random.shuffle(moves)
+            
+            for move in moves:
+                if check_board(board, move):
+                    return move
+
+    
+    # Se houver uma linha com uma marcação do BOT e duas posições vazias, ele joga na posição vazia
+    for i, row in enumerate(board):
+        if sum(row) == -1:
+            for j, column in enumerate(row):
+                if column == 0:
+                    return f"{i + 1} {j + 1}"
+    
+    # Se houver uma coluna com uma marcação do BOT e duas posições vazias, ele joga na posição vazia
+    for i, column in enumerate(board.T):
+        if sum(column) == -1:
+            for j, row in enumerate(column):
+                if row == 0:
+                    return f"{j + 1} {i + 1}"
+    
+    # Se a diagonal com uma marcação do BOT e duas posições vazias, ele joga na posição vazia
+    if sum(diagonal) == -1:
+        for i, row in enumerate(diagonal):
+            if row == 0:
+                return f"{i + 1} {i + 1}"
+    
+    # Se a diagonal secundária com uma marcação do BOT e duas posições vazias, ele joga na posição vazia
+    if sum(secondary_diagonal) == -1:
+        for i, row in enumerate(secondary_diagonal):
+            if row == 0:
+                return f"{i + 1} {3 - i}"
+            
+    # Se não atender nenhuma condição acima, joga aleatoriamente
+    # Pega as posições vazias do tabuleiro
+    indices = np.argwhere(board == 0)
+
+    # Escolhe uma posição aleatória
+    np.random.seed()
+    i, j = np.random.choice(indices)
+
+    # Retorna a posição escolhida
+    return f"{i + 1} {j + 1}"
+
 # Essa função executa o jogo
-def game(names: List[str]):
+def game(names: List[str], versus: str):
     # Sorteia quem começa o jogo
     first = game_start(names)
 
@@ -155,30 +364,41 @@ def game(names: List[str]):
     for player in players:
         # Se for a primeira jogada, muda a mensagem
         if number_of_moves == 0:
-            print(f"\nO jogador {player} começa o jogo!\n")
-        else:
+            # Se o jogador for o BOT, muda a mensagem
+            if player == "BOT" and versus == "bot":
+                print("\nO BOT começa o jogo!")
+            else:
+                print(f"\nO jogador {player} começa o jogo!\n")
+        elif not (versus == "bot" and player == "BOT"):
             print(f"\nÉ a vez de {player}!\n")
         
-        # Imprime o tabuleiro
-        print_board(board)
-        # Pede as coordenadas da jogada
-        move = input("\nSelecione as coordenadas da jogada (linha, coluna) [EX: 1 2]: ")
+        if player == "BOT" and versus == "bot":
+            # Jogada do BOT
+            move = bot_move(board, number_of_moves)
 
-        # Enquanto a jogada não for válida, pede novas coordenadas
-        while True:
-            try:
-                if check_board(board, move):
-                    pass
-                else:
-                    move = input("\nEssa posição já foi ocupada! Selecione outra: ")
+            # Atualiza o tabuleiro com a jogada do BOT
+            board = update_board(board, move, draw)
+        else:
+            # Imprime o tabuleiro
+            print_board(board)
+            # Pede as coordenadas da jogada
+            move = input("\nSelecione as coordenadas da jogada (linha, coluna) [EX: 1 2]: ")
+
+            # Enquanto a jogada não for válida, pede novas coordenadas
+            while True:
+                try:
+                    if check_board(board, move):
+                        pass
+                    else:
+                        move = input("\nEssa posição já foi ocupada! Selecione outra: ")
+                        continue
+
+                    board = update_board(board, move, draw)
+                except:
+                    move = input("\nCoordenadas inválidas! Selecione outra: ")
                     continue
 
-                board = update_board(board, move, draw)
-            except:
-                move = input("\nCoordenadas inválidas! Selecione outra: ")
-                continue
-
-            break
+                break
 
         # Atualiza o número de jogadas e o jogador que vai jogar
         number_of_moves += 1
@@ -191,13 +411,21 @@ def game(names: List[str]):
 def main():
     print("Seja bem vindo ao jogo da velha!\n")
 
-    # Pede os nomes dos jogadores
-    names = []
-    names.append(input('Digite o nome do primeiro jogador (O): '))
-    names.append(input('Digite o nome do segundo jogador (X): '))
-    
-    # Inicia o jogo
-    game(names)
+    match int(input("Digite [1] para jogar contra o bot ou [2] para jogar contra outro jogador: ")):
+        case 1:
+            # Pede o nome do jogador
+            name = input("\nDigite o seu nome: ")
+
+            # Executa o jogo contra o bot
+            game([name, 'BOT'], 'bot')
+        case 2:
+            # Pede os nomes dos jogadores
+            names = []
+            names.append(input('\nDigite o nome do primeiro jogador (O): '))
+            names.append(input('Digite o nome do segundo jogador (X): '))
+
+            # Executa o jogo contra outro jogador
+            game(names, 'player')
 
 if __name__ == '__main__':
     main()
