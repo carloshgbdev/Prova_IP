@@ -18,11 +18,22 @@ def game_start(names: List[str]):
 
 # Essa função imprime o tabuleiro
 def print_board(board: np.ndarray):
-    for row in board:
+    for index, row in enumerate(board):
+        print(index + 1, end=' ')
         for column in row:
-            print(column, end=' ')
+            # Se o valor da posição for 0, imprime um espaço vazio
+            if column == 0:
+                print("[ ]", end=' ')
+            # Se o valor da posição for 1, imprime um O
+            elif column == 1:
+                print("[O]", end=' ')
+            # Se o valor da posição for -1, imprime um X
+            elif column == -1:
+                print("[X]", end=' ')
         
         print()
+    
+    print("   1   2   3")
 
 # Essa função checa se a posição escolhida está vazia
 def check_board(board: np.ndarray, move: str):
@@ -30,7 +41,7 @@ def check_board(board: np.ndarray, move: str):
     move = [int(position) for position in move.split(' ')]
 
     # Checa se a posição escolhida está vazia
-    if board[move[0], move[1]] == 0:
+    if board[move[0] - 1, move[1] - 1] == 0:
         return True
     else:
         return False
@@ -43,11 +54,11 @@ def update_board(board: np.ndarray, move: str, draw: int):
     # Se draw == 0, o jogador O fez a jogada
     if draw == 0:
         # Atualiza o tabuleiro com a jogada do jogador O como um valor inteiro 1
-        board[move[0], move[1]] = 1
+        board[move[0] - 1, move[1] - 1] = 1
     # Se draw == 1, o jogador X fez a jogada
     elif draw == 1:
         # Atualiza o tabuleiro com a jogada do jogador X como um valor inteiro -1
-        board[move[0], move[1]] = -1
+        board[move[0] - 1, move[1] - 1] = -1
     
     return board
 
@@ -57,11 +68,13 @@ def check_winner(board: np.ndarray, names: List[str]):
     for row in board:
         # Se a soma de uma linha for 3, o jogador O venceu
         if sum(row) == 3:
+            print()
             print_board(board)
             print(f"\nO jogador {names[0]} venceu!")
             return True
         # Se a soma de uma linha for -3, o jogador X venceu
         elif sum(row) == -3:
+            print()
             print_board(board)
             print(f"\nO jogador {names[1]} venceu!")
             return True
@@ -70,11 +83,13 @@ def check_winner(board: np.ndarray, names: List[str]):
     for column in board.T:
         # Se a soma de uma coluna for 3, o jogador O venceu
         if sum(column) == 3:
+            print()
             print_board(board)
             print(f"\nO jogador {names[0]} venceu!")
             return True
         # Se a soma de uma coluna for -3, o jogador X venceu
         elif sum(column) == -3:
+            print()
             print_board(board)
             print(f"\nO jogador {names[1]} venceu!")
             return True
@@ -84,11 +99,13 @@ def check_winner(board: np.ndarray, names: List[str]):
 
     # Se a soma de uma diagonal for 3, o jogador O venceu
     if sum(diagonal) == 3:
+        print()
         print_board(board)
         print(f"\nO jogador {names[0]} venceu!")
         return True
     # Se a soma de uma diagonal for -3, o jogador X venceu
     elif sum(diagonal) == -3:
+        print()
         print_board(board)
         print(f"\nO jogador {names[1]} venceu!")
         return True
@@ -98,17 +115,20 @@ def check_winner(board: np.ndarray, names: List[str]):
 
     # Se a soma da diagonal secundária for 3, o jogador O venceu
     if sum(diagonal) == 3:
+        print()
         print_board(board)
         print(f"\nO jogador {names[0]} venceu!")
         return True
     # Se a soma da diagonal secundária for -3, o jogador X venceu
     elif sum(diagonal) == -3:
+        print()
         print_board(board)
         print(f"\nO jogador {names[1]} venceu!")
         return True
 
     # Se não houver vencedor e o tabuleiro estiver cheio, deu velha
     if np.count_nonzero(board) == 9:
+        print()
         print_board(board)
         print("\nDeu velha!")
         return True
