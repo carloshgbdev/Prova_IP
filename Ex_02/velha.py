@@ -68,75 +68,48 @@ def check_winner(board: np.ndarray, names: List[str]):
     for row in board:
         # Se a soma de uma linha for 3, o jogador O venceu
         if sum(row) == 3:
-            print()
-            print_board(board)
-            print(f"\nO jogador {names[0]} venceu!")
-            return True
+            return (True, names[0])
         # Se a soma de uma linha for -3, o jogador X venceu
         elif sum(row) == -3:
-            print()
-            print_board(board)
-            print(f"\nO jogador {names[1]} venceu!")
-            return True
+            return (True, names[1])
 
     # Transpõe o tabuleiro para checar as colunas
     for column in board.T:
         # Se a soma de uma coluna for 3, o jogador O venceu
         if sum(column) == 3:
-            print()
-            print_board(board)
-            print(f"\nO jogador {names[0]} venceu!")
-            return True
+            return (True, names[0])
         # Se a soma de uma coluna for -3, o jogador X venceu
         elif sum(column) == -3:
-            print()
-            print_board(board)
-            print(f"\nO jogador {names[1]} venceu!")
-            return True
+            return (True, names[1])
 
     # Checa as diagonais do tabuleiro
     diagonal = board.diagonal()
 
     # Se a soma de uma diagonal for 3, o jogador O venceu
     if sum(diagonal) == 3:
-        print()
-        print_board(board)
-        print(f"\nO jogador {names[0]} venceu!")
-        return True
+        return (True, names[0])
     # Se a soma de uma diagonal for -3, o jogador X venceu
     elif sum(diagonal) == -3:
-        print()
-        print_board(board)
-        print(f"\nO jogador {names[1]} venceu!")
-        return True
+        return (True, names[1])
     
     # Checa a diagonal secundária do tabuleiro
     diagonal = np.fliplr(board).diagonal()
 
     # Se a soma da diagonal secundária for 3, o jogador O venceu
     if sum(diagonal) == 3:
-        print()
-        print_board(board)
-        print(f"\nO jogador {names[0]} venceu!")
-        return True
+        return (True, names[0])
     # Se a soma da diagonal secundária for -3, o jogador X venceu
     elif sum(diagonal) == -3:
-        print()
-        print_board(board)
-        print(f"\nO jogador {names[1]} venceu!")
-        return True
+        return (True, names[1])
 
     # Se não houver vencedor e o tabuleiro estiver cheio, deu velha
     if np.count_nonzero(board) == 9:
-        print()
-        print_board(board)
-        print("\nDeu velha!")
-        return True
+        return (True, "Velha")
 
-    return False
+    return (False, "Nobody")
 
-# Essa função executa a jogada do BOT
-def bot_move(board: np.ndarray, number_of_moves: int):
+# Essa função define a estratégia de jogada do BOT
+def strategy_move(board: np.ndarray, number_of_moves: int):
     # Se for a primeira jogada do BOT, ele joga ou no centro ou em um canto de esquina aleatório
     if number_of_moves in [0, 1]:
         if check_board(board, "2 2"):
@@ -237,16 +210,17 @@ def bot_move(board: np.ndarray, number_of_moves: int):
     if board[0, 1] == 1:
         if board[1, 2] == 1:
             np.random.seed()
-            moves = ["1 1", "3 3", "1 3"]
-            moves = np.random.shuffle(moves)
+            moves = np.array(["1 1", "3 3", "1 3"])
+            np.random.shuffle(moves)
 
+            print(moves)
             for move in moves:
                 if check_board(board, move):
                     return move
         elif board[1, 0] == 1:
             np.random.seed()
             moves = ["1 3", "3 1", "1 1"]
-            moves = np.random.shuffle(moves)
+            np.random.shuffle(moves)
             
             for move in moves:
                 if check_board(board, move):
@@ -255,7 +229,7 @@ def bot_move(board: np.ndarray, number_of_moves: int):
         if board[1, 0] == 1:
             np.random.seed()
             moves = ["3 3", "1 1", "3 1"]
-            moves = np.random.shuffle(moves)
+            np.random.shuffle(moves)
             
             for move in moves:
                 if check_board(board, move):
@@ -263,7 +237,7 @@ def bot_move(board: np.ndarray, number_of_moves: int):
         elif board[1, 2] == 1:
             np.random.seed()
             moves = ["3 1", "1 3", "3 3"]
-            moves = np.random.shuffle(moves)
+            np.random.shuffle(moves)
             
             for move in moves:
                 if check_board(board, move):
@@ -278,7 +252,7 @@ def bot_move(board: np.ndarray, number_of_moves: int):
         if corners:
             np.random.seed()
             moves = ["1 1", "1 3", "3 1", "3 3"]
-            moves = np.random.shuffle(moves)
+            np.random.shuffle(moves)
             
             for move in moves:
                 if check_board(board, move):
@@ -292,7 +266,7 @@ def bot_move(board: np.ndarray, number_of_moves: int):
         if board[0, 0] == -1 or board[2, 2] == -1:
             np.random.seed()
             moves = ["1 3", "3 1"]
-            moves = np.random.shuffle(moves)
+            np.random.shuffle(moves)
             
             for move in moves:
                 if check_board(board, move):
@@ -300,7 +274,7 @@ def bot_move(board: np.ndarray, number_of_moves: int):
         elif board[0, 2] == -1 or board[2, 0] == -1:
             np.random.seed()
             moves = ["1 1", "3 3"]
-            moves = np.random.shuffle(moves)
+            np.random.shuffle(moves)
             
             for move in moves:
                 if check_board(board, move):
@@ -343,6 +317,19 @@ def bot_move(board: np.ndarray, number_of_moves: int):
 
     # Retorna a posição escolhida
     return f"{i + 1} {j + 1}"
+
+# Essa função retorna a jogada do BOT
+def bot_move(board: np.ndarray, number_of_moves: int):
+    # Verifica se o tabuleiro está vazio
+    if np.all(board == 0):
+        # Se estiver vazio, joga aleatoriamente
+        np.random.seed()
+        i, j = np.random.randint(3, size=2)
+
+        return f"{i + 1} {j + 1}"
+    else:
+        # Se não estiver vazio, joga de acordo com a estratégia
+        return strategy_move(board, number_of_moves)
 
 # Essa função executa o jogo
 def game(names: List[str], versus: str):
@@ -405,7 +392,17 @@ def game(names: List[str], versus: str):
         draw = 1 - draw
 
         # Checa se há um vencedor
-        if check_winner(board, names):
+        winner, who = check_winner(board, names)
+        if winner:
+            print()
+            print_board(board)
+
+            # Imprime o vencedor
+            if who != "velha":
+                print(f"\nO jogador {who} venceu!")
+            else:
+                print("\nDeu velha!")
+
             break
 
 def main():
