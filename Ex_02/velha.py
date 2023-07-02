@@ -212,8 +212,7 @@ def strategy_move(board: np.ndarray, number_of_moves: int):
             np.random.seed()
             moves = np.array(["1 1", "3 3", "1 3"])
             np.random.shuffle(moves)
-
-            print(moves)
+            
             for move in moves:
                 if check_board(board, move):
                     return move
